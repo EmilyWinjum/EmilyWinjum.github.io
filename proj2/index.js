@@ -63,7 +63,9 @@ function postTwit(input, author, container) {
     text.className = "twit-text";
 
     var auth = document.createElement("p");
-    auth.appendChild(document.createTextNode(author));
+    auth.appendChild(document.createElement("a"));
+    auth.querySelector("a").href = "#";
+    auth.querySelector("a").appendChild(document.createTextNode(author));
     auth.className = "twit-author";
 
     var icon = document.createElement("i");
@@ -108,6 +110,7 @@ searchInput.onkeyup = function() {
                 twitList[j]
                 .querySelector(".twit-content")
                 .querySelector(".twit-author")
+                .querySelector("a")
                 .textContent,
                 twitContainer
             )
@@ -124,6 +127,7 @@ searchInput.onkeyup = function() {
             !twits[i]
             .querySelector(".twit-content")
             .querySelector(".twit-author")
+            .querySelector("a")
             .textContent.includes(input)
         ) {
             twitList.push(twits[i]);
