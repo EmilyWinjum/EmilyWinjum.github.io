@@ -98,8 +98,12 @@ var searchInput = document.getElementById("navbar-search-input");
 var twits = document.getElementsByClassName("twit");
 
 searchInput.onkeyup = function() {
-    input = searchInput.value;
-    console.log(input);
+    var input = searchInput.value;
+    var inputReg = new RegExp(input, "g");
+    var replacement = '<span style="background-color:#aaccf6">'
+    replacementReg = new RegExp(replacement, "g");
+
+    //console.log(input);
     if (twitList.length > 0) {
         for (var j = 0; j < twitList.length; j++) {
             postTwit(
@@ -118,20 +122,27 @@ searchInput.onkeyup = function() {
         twitList = [];
     }
     for (var i = 0; i < twits.length; i++) {
+        var twitText = twits[i]
+        .querySelector(".twit-content")
+        .querySelector(".twit-text");
+        var twitAuth = twits[i]
+        .querySelector(".twit-content")
+        .querySelector(".twit-author")
+        .querySelector("a");
+
+        twitText.innerHTML = twitText.innerHTML.replace(replacementReg, '');
+        twitText.innerHTML = twitText.innerHTML.replace('</span>', '');
+
         if (
-            !twits[i]
-            .querySelector(".twit-content")
-            .querySelector(".twit-text")
-            .textContent.includes(input)
+            !twitText.textContent.includes(input)
             &&
-            !twits[i]
-            .querySelector(".twit-content")
-            .querySelector(".twit-author")
-            .querySelector("a")
-            .textContent.includes(input)
+            !twitAuth.textContent.includes(input)
         ) {
             twitList.push(twits[i]);
-            console.log(i);
+            //console.log(i);
+        } else if (input.length > 0) {
+            twitText.innerHTML = twitText.innerHTML.replace(inputReg, replacement + input + '</span>');
+            console.log(input, twitText.innerHTML);
         }
     }
     for (var k = 0; k < twitList.length; k++) {
