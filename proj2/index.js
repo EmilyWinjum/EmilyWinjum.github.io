@@ -3,7 +3,7 @@
  */
 
 /*******************
- * MODAL FUNCTIONS *
+ * MODAL VARIABLES *
  ******************/
 
 var modalStuff = document.getElementsByClassName("hidden");
@@ -13,19 +13,23 @@ var closeButton = document.getElementsByClassName("modal-close-button")[0];
 var acceptButton = document.getElementsByClassName("modal-accept-button")[0];
 var twitContainer = document.getElementsByClassName("twit-container")[0];
 
-modalButton.onclick = function() {
+/*******************
+ * MODAL FUNCTIONS *
+ ******************/
+
+modalButton.addEventListener('click', function() {
     setDisplay(modalStuff, "block");
-}
+});
 
-cancelButton.onclick = function() {
+cancelButton.addEventListener('click', function() {
     setDisplay(modalStuff, "none");
-}
+});
 
-closeButton.onclick = function() {
+closeButton.addEventListener('click', function() {
     setDisplay(modalStuff, "none");
-}
+});
 
-acceptButton.onclick = function() {
+acceptButton.addEventListener('click', function() {
     text = document.getElementById("twit-text-input").value;
     auth = document.getElementById("twit-attribution-input").value;
     if (auth === '' && text === '') {
@@ -42,7 +46,7 @@ acceptButton.onclick = function() {
     }
     postTwit(text, auth, twitContainer);
     setDisplay(modalStuff, "none");
-}
+});
 
 //Content contains the values specified by modalButton
 //display contains the string value to pass to style.display
@@ -86,66 +90,51 @@ function postTwit(input, author, container) {
     article.className = "twit";
 
     container.appendChild(article);
+    allTwits.push(article);
 }
+
+/*******************
+ * SEARCH VARIABLES *
+ ******************/
+
+var searchButton = document.getElementById("navbar-search-button");
+var searchInput = document.getElementById("navbar-search-input");
+var shownTwits = Array.from(twitContainer.getElementsByClassName("twit"));
+var allTwits = shownTwits;
 
 /*******************
 * SEARCH FUNCTIONS *
 *******************/
 
-var twitList = [];
-var searchButton = document.getElementById("navbar-search-button");
-var searchInput = document.getElementById("navbar-search-input");
-var twits = document.getElementsByClassName("twit");
+searchInput.addEventListener('keyup', function() {
+    shownTwits = search(shownTwits, allTwits);
+});
 
-searchInput.onkeyup = function() {
+function search(shown, all) {
     var input = searchInput.value;
-    var inputReg = new RegExp(input, "g");
-    var replacement = '<span style="background-color:#aaccf6">'
-    replacementReg = new RegExp(replacement, "g");
 
-    //console.log(input);
-    if (twitList.length > 0) {
-        for (var j = 0; j < twitList.length; j++) {
-            postTwit(
-                twitList[j]
-                .querySelector(".twit-content")
-                .querySelector(".twit-text")
-                .textContent,
-                twitList[j]
-                .querySelector(".twit-content")
-                .querySelector(".twit-author")
-                .querySelector("a")
-                .textContent,
-                twitContainer
-            )
-        }
-        twitList = [];
+    for (var i = shown.length - 1; i >= 0; i--) {
+        twitContainer.removeChild(shown[i]);
     }
-    for (var i = 0; i < twits.length; i++) {
-        var twitText = twits[i]
+    shown = [];
+
+    for (var i = 0; i < all.length; i++) {
+        var twitText = all[i]
         .querySelector(".twit-content")
         .querySelector(".twit-text");
-        var twitAuth = twits[i]
+        var twitAuth = all[i]
         .querySelector(".twit-content")
         .querySelector(".twit-author")
         .querySelector("a");
 
-        twitText.innerHTML = twitText.innerHTML.replace(replacementReg, '');
-        twitText.innerHTML = twitText.innerHTML.replace('</span>', '');
-
         if (
-            !twitText.textContent.includes(input)
-            &&
-            !twitAuth.textContent.includes(input)
+            twitText.textContent.includes(input)
+            ||
+            twitAuth.textContent.includes(input)
         ) {
-            twitList.push(twits[i]);
-            //console.log(i);
-        } else if (input.length > 0) {
-            twitText.innerHTML = twitText.innerHTML.replace(inputReg, replacement + input + '</span>');
-            console.log(input, twitText.innerHTML);
+            shown.push(all[i]);
+            twitContainer.appendChild(all[i]);
         }
     }
-    for (var k = 0; k < twitList.length; k++) {
-        twitContainer.removeChild(twitList[k]);
-    }
+    return shown;
 }
